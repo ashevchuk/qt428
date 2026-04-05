@@ -94,7 +94,6 @@ bool QT428::sendMessage(const std::vector<uint8_t>& buffer)
         return true;
     }
 
-    hexdump(buffer.data(), buffer.size());
     return (_tcpSocket.send(buffer.data(), msgLength) == msgLength);
 }
 

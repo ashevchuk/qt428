@@ -86,7 +86,7 @@ size_t TCPSocket::send(const void* data, size_t size)
             }
             return result;
         }
-        bytesProcessed += size;
+        bytesProcessed += result;
     }
     return bytesProcessed;
 }

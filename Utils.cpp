@@ -32,18 +32,18 @@ void hexdump(const unsigned char *data, size_t length)
     asciibuf[16] = '\0';
     for (unsigned int index = 0; index < length; index++) {
         if((index % 16) == 0) {
-            printf("%08X ", index);
+            fprintf(stderr, "%08X ", index);
         }
 
         if((index % 8) == 0) {
-            putchar(' ');
+            fputc(' ', stderr);
         }
-        printf("%02X ", data[index]);
+        fprintf(stderr, "%02X ", data[index]);
         asciibuf[index % 16] = isprint(data[index])?data[index]:'.';
 
         if((index % 16) == 15) {
-            printf("  %s\n", asciibuf);
+            fprintf(stderr, "  %s\n", asciibuf);
         }
     }
-    printf("\n");
+    fprintf(stderr, "\n");
 }

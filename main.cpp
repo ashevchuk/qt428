@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     int logLevel = 0;
     int opt;
 
-    while((opt = getopt(argc, argv, "u:p:c:")) != -1) {
+    while((opt = getopt(argc, argv, "vu:p:c:")) != -1) {
         switch(opt) {
             case 'u':
                 user.assign(optarg);
