@@ -2,6 +2,7 @@
 Description=QT428 DVR MJPEG stream (channel %i)
 After=network-online.target
 Wants=network-online.target
+StartLimitIntervalSec=0
 
 [Service]
 # Copy this file to /etc/systemd/system/qt428@.service
@@ -39,8 +40,10 @@ ExecStart=/home/slayer/devel/qt428/qt428 \
     -q ${QUALITY} \
     ${DVR_HOST}:${DVR_PORT}
 
-Restart=on-failure
+Restart=always
 RestartSec=5
+RestartSteps=4
+RestartMaxDelaySec=60
 StandardOutput=journal
 StandardError=journal
 
