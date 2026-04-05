@@ -1,0 +1,48 @@
+[Unit]
+Description=QT428 DVR MJPEG stream (channel %i)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# Copy this file to /etc/systemd/system/qt428@.service
+# Then enable per channel:
+#   systemctl enable --now qt428@1
+#   systemctl enable --now qt428@2
+#
+# Override any parameter with a drop-in, e.g.:
+#   systemctl edit qt428@1
+# and set:
+#   [Service]
+#   Environment=DVR_HOST=192.168.1.2
+#   Environment=DVR_PORT=6036
+#   Environment=DVR_USER=admin
+#   Environment=DVR_PASS=123456
+#   Environment=HTTP_PORT=8081
+#   Environment=FPS=10
+#   Environment=QUALITY=3
+
+Environment=DVR_HOST=10.100.100.25
+Environment=DVR_PORT=6036
+Environment=DVR_USER=admin
+Environment=DVR_PASS=123456
+# HTTP port = 8080 + channel number  (ch1→8081, ch2→8082, ...)
+Environment=HTTP_PORT=808%i
+Environment=FPS=10
+Environment=QUALITY=3
+
+ExecStart=/home/slayer/devel/qt428/qt428 \
+    -u ${DVR_USER} \
+    -p ${DVR_PASS} \
+    -c %i \
+    -s ${HTTP_PORT} \
+    -f ${FPS} \
+    -q ${QUALITY} \
+    ${DVR_HOST}:${DVR_PORT}
+
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

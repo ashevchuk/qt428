@@ -3,11 +3,14 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <functional>
 
 #include <stdint.h>
 
 #include "TCPSocket.hpp"
 #include "Logger.hpp"
+
+using VideoCallback = std::function<void(const uint8_t*, size_t)>;
 
 const uint32_t START_HEADER = 0x64616568;       /* "head" */
 const uint32_t MESSAGE_HEADER = 0x31313131;     /* "1111" */
@@ -51,6 +54,7 @@ public:
     void onUnknownMessageB(const std::vector<uint8_t>& data);
 
     void sendEnableLiveVideo(uint32_t channel);
+    void setVideoCallback(VideoCallback cb) { _videoCallback = std::move(cb); }
 private:
     void onConnect(void);
     bool recvMessage(void);
@@ -66,6 +70,7 @@ private:
     std::string _password;
     uint8_t _channel;
     std::ostream& _outputStream;
+    VideoCallback _videoCallback;
     time_t _lastPing;
     std::vector<uint8_t> _packBuffer;
     std::vector<uint8_t> _rxBuffer;

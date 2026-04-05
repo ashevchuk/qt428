@@ -427,5 +427,11 @@ void QT428::onPackMessage(const std::vector<uint8_t>& data)
 
 void QT428::saveVideo(const std::vector<uint8_t>& data, size_t offset)
 {
-    _outputStream.write(((const char *)data.data()) + offset, data.size() - offset);
+    const uint8_t* ptr = data.data() + offset;
+    size_t len = data.size() - offset;
+    if (_videoCallback) {
+        _videoCallback(ptr, len);
+    } else {
+        _outputStream.write(reinterpret_cast<const char*>(ptr), len);
+    }
 }

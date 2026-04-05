@@ -1,39 +1,77 @@
-
 qt428
 =====
-This hack allows you to stream the live video feed from a QSee QT428 DVR
-security camera to an H.264 video player.
+Streams live H.264 video from a QSee QT428 DVR over its proprietary TCP
+protocol (port 6036).  The protocol was reverse-engineered from packet
+captures; many structures and fields are still unknown or guesses.
 
-I started by trying out zmodopipe, but found it did not work with my DVR,
-possibly since I had upgraded the firmware to 3.2.0.
+Two output modes are supported:
 
-This code was created from reverse engineering ethernet packet samples and
-refering to the zmodopipe code.  Many of the structures and fields are unknown
-or guesses.
+* **Pipe mode** — raw H.264 is written to stdout and can be piped directly
+  into `ffplay` or `mplayer`.
+* **HTTP MJPEG server mode** — an embedded HTTP server converts the stream
+  to MJPEG on-the-fly via `ffmpeg` and serves it to any number of clients
+  (browser, VLC, Home Assistant, etc.).
 
-The only video player I found that could reliably play the H.264 video stream
-was mplayer and ffplay.
-
-To view multiple channels, simply start multiple instance of the program with
-different channel arguments.
+The code originally derived from [zmodopipe](https://github.com/zmodopipe),
+which did not work with firmware 3.2.0+.
 
 
 Compiling
 ---------
-I've included a simple Makefile.  The code is standard C++ and does not use
-any unusual libraries.  I've only tried it in Linux, but it should be
-relatively easy to port to other platforms.
+Requires a C++11 compiler, POSIX threads, and `ffmpeg` on `$PATH` (only
+needed for MJPEG server mode).
 
-Running
--------
-Example:
+```
+make
+```
 
-`qt428 -c 2 192.168.1.2 | ffplay -`
 
-You can run multiple instances for multiple video channels.  Password and username
-can be specified with -p and -u respectively.
+Usage
+-----
+```
+qt428 [-v] [-u <user>] [-p <pass>] [-c <ch>] [-s <port> [-f <fps>] [-q <quality>]] host[:port]
+
+  -v            Verbose output.
+  -u <username> DVR username (default: admin).
+  -p <password> DVR password (default: 123456).
+  -c <channel>  Channel number (default: 1).
+  -s <port>     Start HTTP MJPEG server on <port> (disables stdout stream).
+  -f <fps>      MJPEG output framerate (default: 5).
+  -q <quality>  JPEG quality 1-31, lower is better (default: 5).
+  host[:port]   DVR address; DVR port defaults to 6036.
+```
+
+### Pipe mode
+
+```bash
+# Single channel to ffplay
+qt428 -u admin -p 123456 -c 1 192.168.1.2 | ffplay -
+
+# Multiple channels in parallel
+qt428 -u admin -p 123456 -c 1 192.168.1.2 | ffplay - &
+qt428 -u admin -p 123456 -c 2 192.168.1.2 | ffplay - &
+```
+
+### HTTP MJPEG server mode
+
+```bash
+# Channel 1, 10 fps, high quality
+qt428 -u admin -p 123456 -c 1 -s 8080 -f 10 -q 3 192.168.1.2
+```
+
+Open `http://<host>:8080/` in a browser or any MJPEG-capable client.
+
+To serve all channels simultaneously, run one instance per channel on
+different ports:
+
+```bash
+qt428 -u admin -p 123456 -c 1 -s 8081 192.168.1.2 &
+qt428 -u admin -p 123456 -c 2 -s 8082 192.168.1.2 &
+qt428 -u admin -p 123456 -c 3 -s 8083 192.168.1.2 &
+qt428 -u admin -p 123456 -c 4 -s 8084 192.168.1.2 &
+```
+
 
 License
 -------
-Apache 2.0 License
-
+Apache 2.0

@@ -1,5 +1,5 @@
 CXX = g++
-CXX_CFLAGS = -Wall
+CXX_CFLAGS = -Wall -pthread
 EXEC = qt428
 SRC = $(wildcard *.cpp)
 OBJS = $(SRC:.cpp=.o)
