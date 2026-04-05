@@ -31,7 +31,7 @@ Environment=HTTP_PORT=808%i
 Environment=FPS=10
 Environment=QUALITY=3
 
-ExecStart=/home/slayer/devel/qt428/qt428 \
+ExecStart=/opt/qt428/qt428 \
     -u ${DVR_USER} \
     -p ${DVR_PASS} \
     -c %i \
